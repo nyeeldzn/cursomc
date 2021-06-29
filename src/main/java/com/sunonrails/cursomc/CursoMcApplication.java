@@ -1,6 +1,8 @@
 package com.sunonrails.cursomc;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -12,13 +14,20 @@ import com.sunonrails.cursomc.domain.Cidade;
 import com.sunonrails.cursomc.domain.Cliente;
 import com.sunonrails.cursomc.domain.Endereco;
 import com.sunonrails.cursomc.domain.Estado;
+import com.sunonrails.cursomc.domain.Pagamento;
+import com.sunonrails.cursomc.domain.PagamentoComBoleto;
+import com.sunonrails.cursomc.domain.PagamentoComCartao;
+import com.sunonrails.cursomc.domain.Pedido;
 import com.sunonrails.cursomc.domain.Produto;
+import com.sunonrails.cursomc.domain.enums.EstadoPagamento;
 import com.sunonrails.cursomc.domain.enums.TipoCliente;
 import com.sunonrails.cursomc.repositories.CategoriaRepository;
 import com.sunonrails.cursomc.repositories.CidadeRepository;
 import com.sunonrails.cursomc.repositories.ClienteRepository;
 import com.sunonrails.cursomc.repositories.EnderecoRepository;
 import com.sunonrails.cursomc.repositories.EstadoRepository;
+import com.sunonrails.cursomc.repositories.PagamentoRepository;
+import com.sunonrails.cursomc.repositories.PedidoRepository;
 import com.sunonrails.cursomc.repositories.ProdutoRepository;
 
 @SpringBootApplication
@@ -41,6 +50,12 @@ public class CursoMcApplication implements CommandLineRunner{
 	
 	@Autowired
 	private EnderecoRepository enderecoRepository;
+	
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(CursoMcApplication.class, args);
@@ -90,6 +105,24 @@ public class CursoMcApplication implements CommandLineRunner{
 		
 		clienteRepository.saveAll(Arrays.asList(cli1));
 		enderecoRepository.saveAll(Arrays.asList(e1, e2));
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy HH:mm");
+		Date data = new Date();
+		String dataAtual = sdf.format(data);
+	
+		
+		Pedido ped1 = new Pedido(null, data, cli1, e1);
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
+		ped1.setPagamento(pagto1);
+		
+		Pedido ped2 = new Pedido(null, data, cli1, e2);
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, data, sdf.parse("20/10/2017 00:00"));
+		ped2.setPagamento(pagto2);
+		
+		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+		
+		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
 		
 	}  
 

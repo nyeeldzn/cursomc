@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.sunonrails.cursomc.DTO.CategoriaDTO;
 import com.sunonrails.cursomc.domain.Categoria;
 import com.sunonrails.cursomc.repositories.CategoriaRepository;
 import com.sunonrails.cursomc.services.exceptions.DataIntegrityException;
@@ -58,6 +59,10 @@ public class CategoriaService {
 		}catch (DataIntegrityViolationException ex) {
 					throw new DataIntegrityException("Não é possível deletar uma categoria com produtos");
 				}
+	}
+	
+	public Categoria fromDTO(CategoriaDTO objDto) {
+		return new Categoria(objDto.getId(), objDto.getNome());
 	}
 	
 }

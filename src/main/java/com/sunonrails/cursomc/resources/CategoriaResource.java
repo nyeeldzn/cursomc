@@ -29,12 +29,26 @@ public class CategoriaResource {
 	@Autowired
 	private CategoriaService service;
 	
+	
+	@RequestMapping(method=RequestMethod.POST)
+	public ResponseEntity<Void> insert(@Valid @RequestBody CategoriaDTO objDto) {
+		Categoria obj = service.fromDTO(objDto);
+		obj = service.insert(obj);
+		URI uri = ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.path("/{id}")
+				.buildAndExpand(obj.getId())
+				.toUri();
+		return ResponseEntity.created(uri).build();
+	}
+	
 	@RequestMapping(value="/{id}", method=RequestMethod .GET)
 	public ResponseEntity<Optional<Categoria>> find(@PathVariable Integer id) {
 		
 		Optional<Categoria> obj = Optional.of(service.find(id));
 		return ResponseEntity.ok().body(obj);
 	}
+	
 	
 	@RequestMapping(method=RequestMethod .GET)
 	public ResponseEntity<List<CategoriaDTO>> findAll() {
@@ -57,18 +71,7 @@ public class CategoriaResource {
 		Page<CategoriaDTO> listDto = list.map(obj -> new CategoriaDTO(obj));
 		return ResponseEntity.ok().body(listDto);
 	}
-	
-	@RequestMapping(method=RequestMethod.POST)
-	public ResponseEntity<Void> insert(@Valid @RequestBody CategoriaDTO objDto) {
-		Categoria obj = service.fromDTO(objDto);
-		obj = service.insert(obj);
-		URI uri = ServletUriComponentsBuilder
-				.fromCurrentRequest()
-				.path("/{id}")
-				.buildAndExpand(obj.getId())
-				.toUri();
-		return ResponseEntity.created(uri).build();
-	}
+
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.PUT)
 	public ResponseEntity<Void> update(@Valid @RequestBody CategoriaDTO objDto, @PathVariable Integer id){

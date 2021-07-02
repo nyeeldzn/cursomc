@@ -1,6 +1,6 @@
 package com.sunonrails.cursomc.resources;
 
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.sunonrails.cursomc.DTO.ClienteDTO;
-import com.sunonrails.cursomc.domain.Cliente;
+import com.sunonrails.cursomc.DTO.ClienteNewDTO;
 import com.sunonrails.cursomc.domain.Cliente;
 import com.sunonrails.cursomc.services.ClienteService;
 
@@ -26,6 +27,18 @@ import com.sunonrails.cursomc.services.ClienteService;
 @RequestMapping(value="/clientes")
 public class ClienteResource {
 
+	@RequestMapping(method=RequestMethod.POST)
+	public ResponseEntity<Void> insert(@Valid @RequestBody ClienteNewDTO objDto) {
+		Cliente obj = service.fromDTO(objDto);
+		obj = service.insert(obj);
+		URI uri = ServletUriComponentsBuilder
+				.fromCurrentRequest()
+				.path("/{id}")
+				.buildAndExpand(obj.getId())
+				.toUri();
+		return ResponseEntity.created(uri).build();
+	}
+	
 	@Autowired
 	private ClienteService service;
 	
